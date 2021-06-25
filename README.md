@@ -4,7 +4,12 @@ Tool to automatically gather and format information from GitHub repository issue
 ## Getting Started:
 
 ### Authorization
-To get started, generate a GitHub Authorization Token. Following, download the project and open the github-api-token.json file found in the auth folder. Copy and paste your GitHub token where stated.
+To get started, generate a GitHub Authorization Token. Go to *Settings > Developer settings > Personal access tokens* and click *Generate new token*.
+Here are the minimum scopes to select when creating the key:
+
+[Personal Access Token Scopes](https://i.imgur.com/QaTvgwk.jpg)
+
+Following that, download the project and open the github-api-token.json file found in the auth folder. Copy and paste your GitHub token where stated and save the file.
 
 You do not need to change the file titled *issue-report-generation-ff9748b57ae2.json*. This is a auth file to allow for Google Sheets integration.
 
