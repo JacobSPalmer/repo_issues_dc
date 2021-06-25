@@ -176,7 +176,10 @@ class IssueReport(object):
                 return resultant
             else:
                 request = self.__post_request(self.__simple_report_template)
-                return self.__process_issue_request(request)
+                t = self.__process_issue_request(request)
+                print(" \nReport Completed Successfully: {} Issues Found".format(len(t)))
+                self.report = t.copy()
+                return t
 
     def filter_by_comments(self, min_comments):
         report_copy = self.report.copy()
@@ -196,9 +199,10 @@ class IssueReport(object):
             print("Sampling Successful: {} Issues Sampled".format(sample_amount))
         return samp_report
 
-# if __name__ == '__main__':
-#     report = IssueReport(repo_name="yolov5", repo_owner="ultralytics")
-    # print(report)
+if __name__ == '__main__':
+    # report = IssueReport(repo_name="yolov5", repo_owner="ultralytics")
+    report = IssueReport(repo_name="FastMaskRCNN", repo_owner="CharlesShang").get_report()
+    print(report)
 
     # df = pd.DataFrame(report)
     # print(report)
