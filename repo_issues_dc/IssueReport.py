@@ -142,7 +142,7 @@ class IssueReport(object):
     def __post_request(self, query_template, quantity = 100, cursor =""):
         request = requests.post('https://api.github.com/graphql', json={'query': query_template(quantity, cursor)}, headers=self.headers)
         if request.status_code == 401:
-            raise Exception("Exception 401: Please enter valid authorization token!")
+            raise Exception("Please enter your valid authorization token in auth/github-api-token!")
         elif request.status_code == 200:
             return request.json()
         else:
