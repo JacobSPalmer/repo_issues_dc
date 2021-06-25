@@ -1,8 +1,13 @@
 import requests
 import json
-from progress.bar import ChargingBar
+import pandas as pd
 import random
 import pathlib
+
+from repo_issues_dc import progress_bar_patch
+
+progress = progress_bar_patch.getpatchedprogress()
+from progress.bar import ChargingBar
 
 
 class IssueReport(object):
@@ -14,11 +19,8 @@ class IssueReport(object):
 
         with open(pathlib.Path("auth/github-api-token.json")) as json_file:
             js = json.load(json_file)
-            # if js['TOKEN'] == "enter your token here":
-            #     raise Exception("Please enter ")
 
         #Ignore: use this path if testing within a python IDE
-
         # with open(pathlib.Path("../auth/github-api-token.json")) as json_file:
         #     js = json.load(json_file)
 
@@ -51,6 +53,22 @@ class IssueReport(object):
                     issues(last: 1, states:{}) {{
                       edges {{
                         cursor
+                        node {{
+                          number
+                          url
+                          title
+                          createdAt
+                          comments {{
+                            totalCount
+                          }}
+                          labels(first: 10) {{
+                            edges {{
+                              node {{
+                                name
+                              }}
+                            }}
+                          }}
+                        }}
                       }}
                     }}
                 }}
@@ -116,7 +134,6 @@ class IssueReport(object):
         return q
 
     def __issue_count(self, issue_json: dict) -> int:
-        # print(issue_json)
         r = issue_json['data']['repository']['issues']
         self.num_issues = r['totalCount']
         return self.num_issues
@@ -154,10 +171,12 @@ class IssueReport(object):
         resultant = []
         if iss_count != 0:
             if iss_count > 100:
+                print() #Buffer print for readability
                 bar = ChargingBar(' Report Loading ', suffix='%(percent)d%%', max=(round(iss_count/100)))
                 pagination_r = self.__post_request(self.__initialize_pagination_template)
                 v = pagination_r['data']['repository']['issues']['edges']
                 cursor = v[0]['cursor']
+                primer = self.__process_issue_request(pagination_r)[0]
                 i = iss_count
                 while i / 100 > 1:
                     i = i - 100
@@ -167,21 +186,23 @@ class IssueReport(object):
                     for issues in t:
                         if isinstance(issues, dict):
                             resultant.append(issues.copy())
-                    # print("Report Loading: " + str(round(((len(resultant) / iss_count) * 100))) + "% \n")
+                    # print("Report Loading: " + str(round((((len(resultant)) / iss_count) * 100))) + "% \n")
                     bar.next()
                 request = self.__post_request(self.__report_template, 100, cursor)
                 t = self.__process_issue_request(request)
+                resultant.append(primer)
                 for issues in t:
                     if isinstance(issues, dict):
                         resultant.append(issues.copy())
+                bar.next()
                 bar.finish()
-                print(" \nReport Completed Successfully: {} Issues Found".format(len(resultant)))
+                print(" \n Report Completed Successfully: {} Issues Found\n".format(len(resultant)))
                 self.report = resultant.copy()
                 return resultant
             else:
                 request = self.__post_request(self.__simple_report_template)
                 t = self.__process_issue_request(request)
-                print(" \nReport Completed Successfully: {} Issues Found".format(len(t)))
+                print(" \n Report Completed Successfully: {} Issues Found\n".format(len(t)))
                 self.report = t.copy()
                 return t
 
@@ -197,19 +218,8 @@ class IssueReport(object):
         n = sample_amount
         samp_report = []
         if sample_amount > self.num_issues:
-            raise Exception("Requested sample size of {} is larger than report size. Please try again with a sample size below {}".format(sample_amount, self.num_issues))
+            raise Exception(" Requested sample size of {} is larger than report size. Please try again with a sample size below {}".format(sample_amount, self.num_issues))
         else:
             samp_report = random.sample(self.report, round(n))
-            print("Sampling Successful: {} Issues Sampled".format(sample_amount))
+            print(" Sampling Successful: {} Issues Sampled".format(sample_amount))
         return samp_report
-
-if __name__ == '__main__':
-    # report = IssueReport(repo_name="yolov5", repo_owner="ultralytics")
-    report = IssueReport(repo_name="FastMaskRCNN", repo_owner="CharlesShang").get_report()
-    print(report)
-
-    # df = pd.DataFrame(report)
-    # print(report)
-
-# df = pd.DataFrame(report)
-# print(df.head())

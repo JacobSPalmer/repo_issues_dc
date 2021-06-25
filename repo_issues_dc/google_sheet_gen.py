@@ -12,6 +12,7 @@ credentials = service_account.Credentials.from_service_account_file(
     str(pathlib.Path("auth/issue-report-generation-ff9748b57ae2.json"))
 )
 
+#Ignore unless working within an IDE
 # credentials = service_account.Credentials.from_service_account_file(
 #     str(pathlib.Path("../auth/issue-report-generation-ff9748b57ae2.json"))
 # )
@@ -27,13 +28,11 @@ def create_sheet(title, data):
     sheets_service = build("sheets", "v4", credentials=credentials)
     sheets = sheets_service.spreadsheets()
 
-    # Body of create method with a Spreadsheet(https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets#Spreadsheet) instance
     create_body = {"properties": {"title": f"{title} {date.today()}"},
                    "sheets": list(map(lambda d: {"properties": {"title": d.get("title")}}, data))}
     res = sheets.create(body=create_body).execute()
     spreadsheet_id = res.get("spreadsheetId")
 
-    # Transform the DataFrame into a matrix of the columns and values
     def df_to_sheet(df):
         df_columns = [np.array(df.columns)]
         df_values = df.values.tolist()
@@ -64,6 +63,7 @@ def share_spreadsheet(spreadsheet_id, options, notify=False):
 def generate_spreadsheet_link(issue_list: list) -> str:
     df = pd.DataFrame(issue_list)
     df = df[['repo owner', 'repo name','number', 'url','issue created at', 'labels', 'comments']]
+
     data = [
         {
             "title": "Issues",
@@ -76,14 +76,8 @@ def generate_spreadsheet_link(issue_list: list) -> str:
     }
     res = create_sheet("Report Sheet", data=data)
     share = share_spreadsheet(res.get("spreadsheetId"), options=options)
-    print("Generated Google Sheets Link: " + res.get("spreadsheetUrl"))
+    print(" Generated Google Sheets Link: " + res.get("spreadsheetUrl"))
     return res.get("spreadsheetUrl")
 
 
-# if __name__ == '__main__':
-#     print(pathlib.Path("../auth/github-api-token.json"))
-#     # report = IR.IssueReport(repo_name="yolov5", repo_owner="ultralytics")
-#     report = IR.IssueReport(repo_name="pytorch-CycleGAN-and-pix2pix", repo_owner="junyanz")
-#     sheet = generate_spreadsheet_link(report.get_sample_report(50))
 
-    # print(sheet)
