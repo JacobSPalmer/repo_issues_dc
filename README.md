@@ -1,12 +1,12 @@
 # Repository Issue Report
 Tool to automatically gather and format information from GitHub repository issues for analysis
 
-##Getting Started:
+## Getting Started:
 To get started, generate a GitHub Authorization Token. Following, download the project and open the github-api-token.json file found in the auth folder. Copy and paste your GitHub token where stated.
 
 Ensure that all required packages are installed within the requirements.txt.
 
-##To Run:
+## To Run:
 Navigate to the project folder within terminal/console and run the following command using python:
 
 `python -m repo_issues_dc [name of repository] [owner username of repo]`
