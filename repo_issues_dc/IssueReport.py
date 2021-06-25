@@ -14,6 +14,8 @@ class IssueReport(object):
 
         with open(pathlib.Path("auth/github-api-token.json")) as json_file:
             js = json.load(json_file)
+            # if js['TOKEN'] == "enter your token here":
+            #     raise Exception("Please enter ")
 
         #Ignore: use this path if testing within a python IDE
 
@@ -139,7 +141,9 @@ class IssueReport(object):
 
     def __post_request(self, query_template, quantity = 100, cursor =""):
         request = requests.post('https://api.github.com/graphql', json={'query': query_template(quantity, cursor)}, headers=self.headers)
-        if request.status_code == 200:
+        if request.status_code == 401:
+            raise Exception("Exception 401: Please enter valid authorization token!")
+        elif request.status_code == 200:
             return request.json()
         else:
             raise Exception("Query failed to run by returning code of {}. {}".format(request.status_code, query_template(self, quantity, cursor)))
