@@ -11,11 +11,13 @@ class IssueReport(object):
 
     def __init__(self, repo_name: str, repo_owner: str, state="CLOSED"):
 
-        # with open(os.path.abspath("../auth/github-api-token.json")) as json_file:
-        #     js = json.load(json_file)
-
-        with open(pathlib.Path("auth\github-api-token.json")) as json_file:
+        with open(pathlib.Path("auth/github-api-token.json")) as json_file:
             js = json.load(json_file)
+
+        #Ignore: use this path if testing within a python IDE
+
+        # with open(pathlib.Path("../auth/github-api-token.json")) as json_file:
+        #     js = json.load(json_file)
 
         self.repo_name = repo_name
         self.repo_owner = repo_owner

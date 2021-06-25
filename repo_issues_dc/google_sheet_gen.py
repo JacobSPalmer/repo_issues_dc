@@ -8,8 +8,12 @@ import pathlib
 
 
 credentials = service_account.Credentials.from_service_account_file(
-    str(pathlib.Path("auth\issue-report-generation-ff9748b57ae2.json"))
+    str(pathlib.Path("auth/issue-report-generation-ff9748b57ae2.json"))
 )
+
+# credentials = service_account.Credentials.from_service_account_file(
+#     str(pathlib.Path("../auth/issue-report-generation-ff9748b57ae2.json"))
+# )
 
 scopes = credentials.with_scopes(
     [
