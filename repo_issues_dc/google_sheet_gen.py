@@ -80,10 +80,10 @@ def generate_spreadsheet_link(issue_list: list) -> str:
     return res.get("spreadsheetUrl")
 
 
-if __name__ == '__main__':
-    print(pathlib.Path("../auth/github-api-token.json"))
-    # report = IR.IssueReport(repo_name="yolov5", repo_owner="ultralytics")
-    report = IR.IssueReport(repo_name="pytorch-CycleGAN-and-pix2pix", repo_owner="junyanz")
-    sheet = generate_spreadsheet_link(report.get_sample_report(50))
+# if __name__ == '__main__':
+#     print(pathlib.Path("../auth/github-api-token.json"))
+#     # report = IR.IssueReport(repo_name="yolov5", repo_owner="ultralytics")
+#     report = IR.IssueReport(repo_name="pytorch-CycleGAN-and-pix2pix", repo_owner="junyanz")
+#     sheet = generate_spreadsheet_link(report.get_sample_report(50))
 
     # print(sheet)
