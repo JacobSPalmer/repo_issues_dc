@@ -7,6 +7,7 @@ import pandas as pd
 import pathlib
 
 
+
 credentials = service_account.Credentials.from_service_account_file(
     str(pathlib.Path("auth/issue-report-generation-ff9748b57ae2.json"))
 )

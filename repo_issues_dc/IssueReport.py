@@ -11,6 +11,7 @@ class IssueReport(object):
 
     def __init__(self, repo_name: str, repo_owner: str, state="CLOSED"):
 
+
         with open(pathlib.Path("auth/github-api-token.json")) as json_file:
             js = json.load(json_file)
 
