@@ -144,9 +144,9 @@ class IssueReport(object):
             {
                 'cursor': value['cursor'],
                 **value['node'],
-                'number': int(value['node']['number']),
+                'issue ID': int(value['node']['number']),
                 'issue title': value['node']['title'],
-                'issue created at': value['node']['createdAt'],
+                'created at': value['node']['createdAt'],
                 'comments': value['node']['comments']['totalCount'],
                 'labels': ", ".join(x['node']['name'] for x in value['node']['labels']['edges']),
                 'repo owner': self.repo_owner,
@@ -206,13 +206,15 @@ class IssueReport(object):
                 self.report = t.copy()
                 return t
 
-    def filter_by_comments(self, min_comments):
+    def filter_by_comments(self, min_comments = 0):
         report_copy = self.report.copy()
         for value in self.report:
             if value['comments'] < min_comments:
                 report_copy.remove(value)
         self.report = report_copy.copy()
-        print("Returning {} Issues with more than {} comments".format(len(self.report), min_comments))
+        self.num_issues = len(self.report)
+        if min_comments > 0:
+            print(" Returning {} Issues with more than {} comments".format(len(self.report), min_comments))
 
     def get_sample_report(self, sample_amount: int) -> list:
         n = sample_amount
@@ -221,5 +223,32 @@ class IssueReport(object):
             raise Exception(" Requested sample size of {} is larger than report size. Please try again with a sample size below {}".format(sample_amount, self.num_issues))
         else:
             samp_report = random.sample(self.report, round(n))
-            print(" Sampling Successful: {} Issues Sampled".format(sample_amount))
+            print(" Sampling Successful: {} of {} Issues Sampled".format(sample_amount, self.num_issues))
         return samp_report
+
+    def get_sample_report_percent(self, percent: int) -> list:
+        p = percent/100
+        n = round(len(self.report) * p)
+        samp_report = []
+        if percent > 100 | percent < 1:
+            raise Exception(" Sample percentage must be between 0 and 100.")
+        if len(self.report) <= 200:
+            if len(self.report) < 20:
+                raise Exception("Report contains less than 20 issues. Minimum issues to sample is 20.")
+            print(" \n WARNING: Sample contains less than 200 issues, returning 20 of {} issues instead. \n".format(len(self.report)))
+            samp_report = random.sample(self.report, 20)
+            print(" Sampling Successful: {} of {} Issues Sampled".format(len(samp_report), len(self.report)))
+            return samp_report
+        samp_report = random.sample(self.report, n)
+        print(" Sampling Successful: {} of {} Issues Sampled".format(len(samp_report), len(self.report)))
+        return samp_report
+
+if __name__ == '__main__':
+    # report = IssueReport(repo_name="yolov5", repo_owner="ultralytics")
+    # report = IssueReport(repo_name="FastMaskRCNN", repo_owner="CharlesShang").get_report()
+    # report = IssueReport(repo_name="ssd.pytorch", repo_owner="amdegroot").get_report()
+    report = IssueReport(repo_name="keras-retinanet", repo_owner="fizyr")
+    report.filter_by_comments(10)
+    report.get_sample_report_percent(10)
+
+    df = pd.DataFrame(report)

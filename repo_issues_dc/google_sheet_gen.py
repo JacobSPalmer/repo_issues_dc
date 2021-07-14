@@ -24,11 +24,13 @@ scopes = credentials.with_scopes(
     ]
 )
 
-def create_sheet(title, data):
+def create_sheet(title, repo_name, repo_owner, data):
     sheets_service = build("sheets", "v4", credentials=credentials)
     sheets = sheets_service.spreadsheets()
 
-    create_body = {"properties": {"title": f"{title} {date.today()}"},
+    # create_body = {"properties": {"title": f"{title} {date.today()}"},
+    #                "sheets": list(map(lambda d: {"properties": {"title": d.get("title")}}, data))}
+    create_body = {"properties": {"title": f"{title}: {repo_owner}/{repo_name}"},
                    "sheets": list(map(lambda d: {"properties": {"title": d.get("title")}}, data))}
     res = sheets.create(body=create_body).execute()
     spreadsheet_id = res.get("spreadsheetId")
@@ -62,7 +64,8 @@ def share_spreadsheet(spreadsheet_id, options, notify=False):
 
 def generate_spreadsheet_link(issue_list: list) -> str:
     df = pd.DataFrame(issue_list)
-    df = df[['repo owner', 'repo name','number', 'url','issue created at', 'labels', 'comments']]
+    # df = df[['repo owner', 'repo name','issue ID', 'url','issue created at', 'labels', 'comments']]
+    df = df[['issue ID', 'url', 'labels', 'comments', 'created at', 'repo owner', 'repo name']]
 
     data = [
         {
@@ -74,7 +77,9 @@ def generate_spreadsheet_link(issue_list: list) -> str:
         "role" : "reader",
         "type": "anyone"
     }
-    res = create_sheet("Report Sheet", data=data)
+    repo_name = issue_list[0]['repo name']
+    repo_owner = issue_list[0]['repo owner']
+    res = create_sheet("Report Sheet", repo_name = repo_name, repo_owner = repo_owner, data=data)
     share = share_spreadsheet(res.get("spreadsheetId"), options=options)
     print(" Generated Google Sheets Link: " + res.get("spreadsheetUrl"))
     return res.get("spreadsheetUrl")
